@@ -7,6 +7,7 @@ use MirrorApiBundle\Entity\AuthToken;
 use MirrorApiBundle\Entity\Credentials;
 use MirrorApiBundle\Form\CredentialsType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Response;
