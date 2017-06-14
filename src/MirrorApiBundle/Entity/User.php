@@ -14,6 +14,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    const ROLE_USER = "ROLE_USER";
+    const ROLE_MIRROR = "ROLE_MIRROR";
+
     /**
      * @var int
      *
@@ -63,6 +66,12 @@ class User implements UserInterface
      */
     private $modules;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="roles", type="string", length=255)
+     */
+    private $roles;
 
 
     public function __construct()
@@ -221,7 +230,15 @@ class User implements UserInterface
      */
     public function getRoles()
     {
-        return [];
+        return unserialize($this->roles);
+    }
+
+    /**
+     * @param string $roles
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
     }
 
     /**

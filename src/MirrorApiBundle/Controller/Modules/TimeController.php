@@ -5,6 +5,7 @@ namespace MirrorApiBundle\Controller\Modules;
 use MirrorApiBundle\Controller\ControllerTrait;
 use MirrorApiBundle\Entity\Time;
 use MirrorApiBundle\Form\TimeType;
+use MirrorApiBundle\Security\Authorization\Voter\OwnerVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,8 @@ class TimeController extends Controller
             'user'  => $user,
         ]);
 
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER_OR_MIRROR, $timeModule);
+
         if (empty($timeModule)) {
             return new JsonResponse(['message' => 'Time module not found'], Response::HTTP_NOT_FOUND);
         }
@@ -60,6 +63,8 @@ class TimeController extends Controller
         if ($user === null) {
             return $this->userNotFound();
         } else {
+            $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $user);
+
             $time = new Time();
             $time->setUser($user);
 
@@ -96,6 +101,12 @@ class TimeController extends Controller
             'user'  => $user,
         ]);
 
+        if (empty($timeModule)) {
+            return $this->moduleNotFound();
+        }
+
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $timeModule);
+
         $form = $this->createForm(TimeType::class, $timeModule);
 
         $this->convertRequestSnakeCaseToCamelCase($request);
@@ -130,7 +141,7 @@ class TimeController extends Controller
             return $this->moduleNotFound();
         }
 
-        /* @var $place Place */
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $timeModule);
 
         $em->remove($timeModule);
         $em->flush();

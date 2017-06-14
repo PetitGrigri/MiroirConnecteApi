@@ -5,6 +5,7 @@ namespace MirrorApiBundle\Controller\Modules;
 use MirrorApiBundle\Controller\ControllerTrait;
 use MirrorApiBundle\Entity\Weather;
 use MirrorApiBundle\Form\WeatherType;
+use MirrorApiBundle\Security\Authorization\Voter\OwnerVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,18 +33,20 @@ class WeatherController extends Controller
 
         $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:Weather');
 
-        $WeatherModule = $repository->findOneBy([
+        $weatherModule = $repository->findOneBy([
             'id'    => $request->get('weather_module_id'),
             'user'  => $user,
         ]);
 
-        if (empty($WeatherModule)) {
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER_OR_MIRROR, $weatherModule);
+
+        if (empty($weatherModule)) {
             return new JsonResponse(['message' => 'Weather module not found'], Response::HTTP_NOT_FOUND);
         }
 
         //TODO ajouter les href
 
-        return $WeatherModule;
+        return $weatherModule;
     }
 
     /**
@@ -55,14 +58,13 @@ class WeatherController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        /**
-         * @var $place User
-         */
         $user = $em->getRepository('MirrorApiBundle:User')->find($request->get('user_id'));
 
         if ($user === null) {
             return $this->userNotFound();
         } else {
+            $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $user);
+
             $weather = new Weather();
             $weather->setUser($user);
 
@@ -81,7 +83,6 @@ class WeatherController extends Controller
         }
     }
 
-
     /**
      * @Rest\View(serializerGroups={"module"})
      * @Rest\Patch("/user/{user_id}/weather/{weather_module_id}")
@@ -89,26 +90,33 @@ class WeatherController extends Controller
      */
     public function patchWeatherAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        $user = $em->getRepository('MirrorApiBundle:User')->find($request->get('user_id'));
+
         $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:Weather');
 
-        $weather = $repository->find($request->get("weather_module_id"));
+        $weatherModule = $repository->findOneBy([
+            'id'    => $request->get('weather_module_id'),
+            'user'  => $user,
+        ]);
 
-        $form = $this->createForm(WeatherType::class, $weather);
-
-        if (empty($weather)) {
+        if (empty($weatherModule)) {
             return $this->moduleNotFound();
-        } else if ($request->get("user_id") != $weather->getUser()->getId()) {
-            return $this->wrongOwner();
         }
+
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $weatherModule);
+
+        $form = $this->createForm(WeatherType::class, $weatherModule);
 
         $this->convertRequestSnakeCaseToCamelCase($request);
         $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($weather);
+            $em->persist($weatherModule);
             $em->flush();
-            return $weather;
+            return $weatherModule;
         } else {
             return $form;
         }
@@ -133,10 +141,9 @@ class WeatherController extends Controller
             return $this->moduleNotFound();
         }
 
-        /* @var $place Place */
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $weatherModule);
 
         $em->remove($weatherModule);
         $em->flush();
     }
-
 }

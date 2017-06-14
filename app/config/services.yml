@@ -23,3 +23,9 @@ services:
         class:     MirrorApiBundle\Security\AuthTokenAuthenticator
         arguments: ["@security.http_utils"]
         public:    false
+
+    security.access.owner_voter:
+        class:      MirrorApiBundle\Security\Authorization\Voter\OwnerVoter
+        public:     false
+        tags:
+            - { name: security.voter }

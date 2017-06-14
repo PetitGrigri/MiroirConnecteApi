@@ -5,6 +5,7 @@ namespace MirrorApiBundle\Controller;
 
 use MirrorApiBundle\Entity\User;
 use MirrorApiBundle\Form\UserType;
+use MirrorApiBundle\Security\Authorization\Voter\OwnerVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,29 @@ class UserController extends Controller
     {
         $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:User');
 
+
         $user = $repository->find($request->get("user_id"));
+
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER_OR_MIRROR, $user);
+
+        if (empty($user)) {
+            $this->userNotFound();
+        }
+
+        return $user;
+    }
+
+    /**
+     * @Rest\View(serializerGroups={"users"})
+     * @Rest\Get("/users")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getUsersAction(Request $request)
+    {
+        $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:User');
+
+        $user = $repository->findAll();
 
         if (empty($user)) {
             $this->userNotFound();
@@ -44,6 +67,7 @@ class UserController extends Controller
         $this->convertRequestSnakeCaseToCamelCase($request);
 
         $user = new User();
+        $user->setRoles(serialize([User::ROLE_USER]));
 
         $form = $this->createForm(UserType::class, $user);
 
@@ -83,6 +107,8 @@ class UserController extends Controller
             $this->userNotFound();
         }
 
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $user);
+
         $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
@@ -109,8 +135,10 @@ class UserController extends Controller
         $user = $em->getRepository('MirrorApiBundle:User')->find($request->get('user_id'));
 
         if (empty($user)) {
-            return $this->moduleNotFound();
+            return $this->userNotFound();
         }
+
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $user);
 
         $em->remove($user);
         $em->flush();

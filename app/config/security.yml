@@ -15,8 +15,8 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
-            pattern: ^/user
+        new_user:
+            pattern: ^/user$
             methods: [POST]
             stateless: true
             security: false
@@ -28,6 +28,9 @@ security:
                 authenticator: auth_token_authenticator
             provider: auth_token_user_provider
             anonymous: ~
+
+    access_control:
+        - { path: ^/users, roles: ROLE_MIRROR }
 
     encoders:
         MirrorApiBundle\Entity\User:
