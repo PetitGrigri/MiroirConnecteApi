@@ -1,0 +1,4 @@
+services:
+#    mirror_api.example:
+#        class: MirrorApiBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

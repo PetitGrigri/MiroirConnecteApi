@@ -1,0 +1,19 @@
+MirrorApiBundle\Entity\User:
+    exclusion_policy: none
+    properties:
+        id:
+            groups: ['user', 'module', 'auth-token']
+        firstName:
+            groups: ['user', 'module', 'auth-token']
+        lastName:
+            groups: ['user', 'module', 'auth-token']
+        photoName:
+            groups: ['user', 'module', 'auth-token']
+        email:
+            groups: ['user', 'module', 'auth-token']
+        password:
+            exclude: true
+        plainPassword:
+            exclude: true
+        modules:
+            groups: ['user']

@@ -1,0 +1,16 @@
+users:
+    type:     rest
+    resource: MirrorApiBundle\Controller\UserController
+
+weather_modules:
+    type:     rest
+    resource: MirrorApiBundle\Controller\Modules\WeatherController
+
+time_modules:
+    type:     rest
+    resource: MirrorApiBundle\Controller\Modules\TimeController
+
+auth-tokens:
+    type:     rest
+    resource: MirrorApiBundle\Controller\AuthTokenController
+

@@ -1,0 +1,15 @@
+MirrorApiBundle\Entity\Weather:
+    exclusion_policy: none
+    properties:
+        id:
+            groups: ['user', 'module']
+        name:
+            groups: ['user', 'module']
+        position:
+            groups: ['user', 'module']
+        city:
+            groups: ['user', 'module']
+        country:
+            groups: ['user', 'module']
+        user:
+            groups: ['module']

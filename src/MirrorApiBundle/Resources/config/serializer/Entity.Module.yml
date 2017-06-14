@@ -1,0 +1,19 @@
+MirrorApiBundle\Entity\Module:
+    exclusion_policy: none
+    properties:
+        id:
+            groups: ['user', 'module']
+        name:
+            groups: ['user', 'module']
+        position:
+            groups: ['user', 'module']
+        user:
+            groups: ['module']
+    discriminator:
+        field_name: type
+        disabled: false
+        map:
+            weather: MirrorApiBundle\Entity\Weather
+            time: MirrorApiBundle\Entity\Time
+        groups: ['user', 'module']
+

@@ -1,0 +1,13 @@
+MirrorApiBundle\Entity\Time:
+    exclusion_policy: none
+    properties:
+        id:
+            groups: ['user', 'module']
+        name:
+            groups: ['user', 'module']
+        position:
+            groups: ['user', 'module']
+        timeZone:
+            groups: ['user', 'module']
+        user:
+            groups: ['module']
