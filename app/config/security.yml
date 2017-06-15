@@ -35,15 +35,6 @@ security:
             stateless: true
             security: false
 
-        test:
-            pattern: ^/user
-            methods: [GET]
-            stateless: true
-            simple_preauth:
-                authenticator: auth_token_authenticator
-            provider: auth_token_user_provider
-            anonymous: ~
-
     access_control:
         - { path: ^/users, roles: ROLE_MIRROR }
         - { path: ^/photo, roles: ROLE_MIRROR }
