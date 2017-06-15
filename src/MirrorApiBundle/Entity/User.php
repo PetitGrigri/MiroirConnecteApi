@@ -74,6 +74,11 @@ class User implements UserInterface
     private $roles;
 
 
+    /**
+     * @ORM\OneToMany(targetEntity="AuthToken", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $tokens;
+
     public function __construct()
     {
         $this->modules = new ArrayCollection();

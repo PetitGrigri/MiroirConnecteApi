@@ -1,7 +1,11 @@
 MirrorApiBundle\Entity\Time:
     exclusion_policy: none
+    accessor_order: custom
+    custom_accessor_order: [id, type, name, position, timeZone, user]
     properties:
         id:
+            groups: ['user', 'module']
+        type:
             groups: ['user', 'module']
         name:
             groups: ['user', 'module']

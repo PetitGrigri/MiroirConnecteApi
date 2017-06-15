@@ -19,13 +19,11 @@ class UserController extends Controller
     /**
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/user/{user_id}")
-     * @param Request $request
      * @return JsonResponse
      */
     public function getUserAction(Request $request)
     {
         $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:User');
-
 
         $user = $repository->find($request->get("user_id"));
 
@@ -65,6 +63,7 @@ class UserController extends Controller
     public function postUserAction(Request $request)
     {
         $this->convertRequestSnakeCaseToCamelCase($request);
+        $em = $this->getDoctrine()->getManager();
 
         $user = new User();
         $user->setRoles(serialize([User::ROLE_USER]));
@@ -74,14 +73,29 @@ class UserController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            //recherche de la photo correspondante
+            $photo = $this->getDoctrine()->getRepository('MirrorApiBundle:Photo')->findOneBy([
+                "name"  => $user->getPhotoName()
+            ]);
+
+
+            if (empty($photo)) {
+                throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Photo not Found');
+            }
+            else {
+                $user->setPhotoName($photo->getName().".".$photo->getExtension());
+            }
 
             if (!empty($user->getPlainPassword())) {
                 $this->encodePassword($user);
             }
 
-            $em = $this->getDoctrine()->getManager();
+
             $em->persist($user);
             $em->flush();
+            $em->remove($photo);
+            $em->flush();
+
             return $user;
         } else {
             return $form;

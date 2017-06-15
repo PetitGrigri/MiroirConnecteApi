@@ -1,7 +1,7 @@
 MirrorApiBundle\Entity\User:
     exclusion_policy: none
     accessor_order: custom
-    custom_accessor_order: [id, firstName, lastName, email, photoName, roles]
+    custom_accessor_order: [id, firstName, lastName, email, photoName, modules, roles]
     properties:
         id:
             groups: ['user', 'module', 'auth-token', 'users']
