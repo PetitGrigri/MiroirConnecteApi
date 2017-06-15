@@ -15,6 +15,13 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+
+        new_user:
+            pattern: ^/user$
+            methods: [POST]
+            stateless: true
+            security: false
+
         main:
             pattern: ^/
             stateless: true
@@ -23,17 +30,6 @@ security:
             provider: auth_token_user_provider
             anonymous: ~
 
-        new_user:
-            pattern: ^/user
-            methods: [POST]
-            stateless: true
-            security: false
-
-        user:
-            pattern: ^/user
-            methods: [POST]
-            stateless: true
-            security: false
 
     access_control:
         - { path: ^/users, roles: ROLE_MIRROR }
