@@ -113,6 +113,7 @@ class UserController extends Controller
 
         $repository = $this->getDoctrine()->getRepository('MirrorApiBundle:User');
 
+        /* */
         $user = $repository->find($request->get("user_id"));
 
         $form = $this->createForm(UserType::class, $user);
@@ -126,13 +127,39 @@ class UserController extends Controller
         $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
+
+            $containExtension = strpos($user->getPhotoName(), ".");
+
+            if (!$containExtension) {
+                $photo = $this->getDoctrine()->getRepository('MirrorApiBundle:Photo')->findOneBy([
+                    "name"  => $user->getPhotoName()
+                ]);
+
+
+                if (empty($photo)) {
+                    throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Photo not Found');
+                }
+                else {
+                    $user->setPhotoName($photo->getName().".".$photo->getExtension());
+                }
+            }
+
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
+
+            if (!$containExtension){
+                $em->remove($photo);
+                $em->flush();
+            }
+
+
             $em->flush();
             return $user;
         } else {
             return $form;
         }
+        return $user;
     }
 
 
